@@ -25,10 +25,12 @@ module.exports = function (opt) {
   const loggerName = opt.loggerName;
   const requestIdPath = opt.requestIdPath;
   const files = opt.files;
+  const exclude_files = opt.exclude_files || [];
   const store = opt.store || { save: (record) => console.log('%j', record) };
   const yieldCondition = opt.yieldCondition;
   assert(requestIdPath && _.isString(requestIdPath), '`requestIdPath` option must be string');
   assert(files && _.isArray(files), '`files`{array} option required');
+  assert(_.isArray(exclude_files), '`exclude_files`{array} option required');
   assert(store && _.isFunction(store.save), '`store.save`{function} option required, see: koa-yield-breakpoint-mongodb');
   if (yieldCondition) {
     assert(_.isFunction(yieldCondition), '`yieldCondition` option must be function');
@@ -70,6 +72,11 @@ module.exports = function (opt) {
   files.forEach(filePattern => {
     if (filePattern) {
       filenames = filenames.concat(glob.sync(filePattern, opt));
+    }
+  });
+  exclude_files.forEach(filePattern => {
+    if (filePattern) {
+      _.pullAll(filenames, glob.sync(filePattern, opt));
     }
   });
   filenames = _.uniq(filenames);
