@@ -39,7 +39,7 @@ module.exports = function (opt) {
   // add global logger
   global[loggerName] = function *(req, fn, fnStr, filename) {
     if (!req) {
-      return;
+      return yield fn;
     }
     let requestId = _.get(req, requestIdPath);
     if (requestId) {
