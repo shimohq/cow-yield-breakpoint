@@ -89,9 +89,12 @@ module.exports = function (opt) {
         try {
           return __compile.call(this, content, filename);
         } catch(e) {
+          if (e.message.match('hiredis')) {
+            throw e;
+          }
           console.error('cannot compile file: %s', filename);
           console.error(e.stack);
-          process.exit(1);
+          throw e;
         }
       }
 
@@ -114,7 +117,7 @@ module.exports = function (opt) {
       } catch (e) {
         console.error('cannot generate code for file: %s', filename);
         console.error(e.stack);
-        throw e;
+        process.exit(1);
       }
       debug('file %s regenerate codes:\n%s', filename, content.code);
       return __compile.call(this, content.code, filename);
